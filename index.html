@@ -488,38 +488,29 @@
     document.getElementById(pageId).classList.remove('hidden');
   }
 
-  // ─── Create Room: Peer ID = Room Code (lowercase for PeerJS) ───
+  // ─── Create Room: let PeerJS assign a random ID, share it as the room code ───
   function createRoom() {
-    const roomCode = Math.random().toString(36).substring(2, 8);
-    initPeer(roomCode, true);
+    initPeer(true, null);
   }
 
   // ─── Join Room ───
   function joinRoom() {
     const code = document.getElementById('joinInput').value.trim().toLowerCase();
     if (!code) { showToast('أدخل كود الغرفة أولاً'); return; }
-    initPeer(null, false, code); // guest gets random peer ID, calls host by room code
+    initPeer(false, code);
   }
 
   // ─── Init Peer ───
-  // host: peer ID = roomCode so guests can find them
-  // guest: random peer ID, then calls host's peer ID (= roomCode)
-  function initPeer(myId, isHost, hostId) {
+  function initPeer(isHost, hostId) {
     if (peer) { peer.destroy(); }
-
-    peer = myId ? new Peer(myId) : new Peer();
+    peer = new Peer(); // always auto-generated — avoids unavailable-id errors
 
     peer.on('error', err => {
-      if (err.type === 'unavailable-id') {
-        showToast('كود الغرفة مستخدم مسبقاً، جرب مرة ثانية');
-        showPage('homePage');
-      } else {
-        showToast('خطأ في الاتصال: ' + err.type);
-      }
+      showToast('خطأ: ' + err.type);
+      showPage('homePage');
     });
 
     peer.on('open', async id => {
-      // Get mic
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       } catch(e) {
@@ -527,19 +518,15 @@
         return;
       }
 
-      const displayCode = (myId || hostId).toUpperCase();
-
-      // Show call UI
-      showPage('callPage');
-      document.getElementById('callerName').textContent = `غرفة: ${displayCode}`;
-
       if (isHost) {
-        shareLink = window.location.origin + window.location.pathname + '?room=' + myId;
+        // Server-assigned peer ID becomes the room code
+        shareLink = window.location.origin + window.location.pathname + '?room=' + id;
+        showPage('callPage');
+        document.getElementById('callerName').textContent = `كودك: ${id.slice(0,8).toUpperCase()}`;
         const shareBar = document.getElementById('shareBar');
         shareBar.style.display = 'flex';
         document.getElementById('shareLinkText').textContent = shareLink;
 
-        // Host: wait for incoming calls
         peer.on('call', call => {
           currentCall = call;
           call.answer(localStream);
@@ -549,21 +536,25 @@
         });
 
       } else {
-        // Guest: call the host's peer ID (= room code)
+        showPage('callPage');
+        document.getElementById('callerName').textContent = `جارٍ الاتصال…`;
+
         const call = peer.call(hostId, localStream);
         currentCall = call;
 
         if (!call) {
-          showToast('تعذر الاتصال بالغرفة');
+          showToast('تعذر الاتصال — تأكد من الكود');
+          showPage('homePage');
           return;
         }
 
         call.on('stream', remoteStream => {
           setConnected();
+          document.getElementById('callerName').textContent = 'متصل';
           playRemoteStream(remoteStream);
         });
         call.on('close', onCallEnded);
-        call.on('error', () => showToast('فشل الاتصال'));
+        call.on('error', () => { showToast('فشل الاتصال'); showPage('homePage'); });
       }
     });
   }
@@ -659,9 +650,8 @@
 
   // ─── Auto-join if URL has room param ───
   if (roomId) {
-    initPeer(null, false, roomId.toLowerCase());
+    initPeer(false, roomId.toLowerCase());
   }
 </script>
 </body>
 </html>
-
