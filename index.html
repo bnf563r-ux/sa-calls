@@ -1,803 +1,467 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>غرفة الاتصال</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --card: #1a1a26;
-    --border: #2a2a3e;
-    --accent: #6c63ff;
-    --accent2: #ff6584;
-    --green: #00e5a0;
-    --text: #e8e8f0;
-    --muted: #6b6b8a;
-    --glow: 0 0 30px rgba(108,99,255,0.3);
-  }
+<!DOCTYPE html>  <html lang="ar" dir="rtl">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>كلّمني</title>  
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">  
+<style>  
+  :root {  
+    --bg: #0a0a0f; --surface: #12121a; --card: #1a1a26; --border: #2a2a3e;  
+    --accent: #6c63ff; --accent2: #ff6584; --green: #00e5a0;  
+    --text: #e8e8f0; --muted: #6b6b8a;  
+  }  
+  * { margin:0; padding:0; box-sizing:border-box; }  
+  body {  
+    font-family: 'Tajawal', sans-serif; background: var(--bg); color: var(--text);  
+    min-height: 100vh; display: flex; flex-direction: column;  
+    align-items: center; justify-content: center;  
+  }  
+  body::before {  
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:0;  
+    background:  
+      radial-gradient(ellipse 60% 50% at 20% 20%, rgba(108,99,255,.12) 0%, transparent 70%),  
+      radial-gradient(ellipse 50% 60% at 80% 80%, rgba(255,101,132,.08) 0%, transparent 70%);  
+  }  
+  .container { position:relative; z-index:1; width:100%; max-width:500px; padding:20px; }  .logo { text-align:center; margin-bottom:28px; }
+.logo-icon {
+width:60px; height:60px; background:linear-gradient(135deg,var(--accent),var(--accent2));
+border-radius:18px; display:inline-flex; align-items:center; justify-content:center;
+font-size:26px; margin-bottom:10px;
+box-shadow:0 0 30px rgba(108,99,255,.35), 0 8px 24px rgba(0,0,0,.4);
+animation:pulse-logo 3s ease-in-out infinite;
+}
+@keyframes pulse-logo { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+.logo h1 {
+font-size:26px; font-weight:900;
+background:linear-gradient(135deg,#fff 0%,var(--accent) 100%);
+-webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.logo p { color:var(--muted); font-size:13px; margin-top:3px; }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+.card {
+background:var(--card); border:1px solid var(--border); border-radius:22px;
+padding:28px; box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.sec-title { font-size:11px; font-weight:600; color:var(--muted); letter-spacing:1.8px; text-transform:uppercase; margin-bottom:14px; }
+.ig { margin-bottom:14px; }
+.ig label { display:block; font-size:13px; color:var(--muted); margin-bottom:7px; }
+.iw { position:relative; }
+.iw .ic { position:absolute; right:13px; top:50%; transform:translateY(-50%); font-size:15px; pointer-events:none; }
+input {
+width:100%; background:var(--surface); border:1px solid var(--border);
+border-radius:11px; padding:12px 40px 12px 14px; color:var(--text);
+font-family:'Tajawal',sans-serif; font-size:15px; outline:none;
+transition:border-color .2s,box-shadow .2s; direction:rtl;
+}
+input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(108,99,255,.15); }
+input::placeholder { color:var(--muted); }
 
-  body {
-    font-family: 'Tajawal', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
+.btn {
+width:100%; padding:13px; border:none; border-radius:11px;
+font-family:'Tajawal',sans-serif; font-size:15px; font-weight:700;
+cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-p { background:linear-gradient(135deg,var(--accent),#8b7fff); color:#fff; box-shadow:0 4px 20px rgba(108,99,255,.4); }
+.btn-p:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(108,99,255,.5); }
+.btn-o { background:transparent; color:var(--accent); border:1.5px solid var(--accent); }
+.btn-o:hover { background:rgba(108,99,255,.1); }
+.btn-d { background:linear-gradient(135deg,#ff4757,#ff6584); color:#fff; }
 
-  /* Animated background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 50% at 20% 20%, rgba(108,99,255,0.12) 0%, transparent 70%),
-      radial-gradient(ellipse 50% 60% at 80% 80%, rgba(255,101,132,0.08) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(0,229,160,0.05) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
+.divider { display:flex; align-items:center; gap:12px; margin:18px 0; }
+.divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
+.divider span { color:var(--muted); font-size:12px; }
 
-  .container {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 520px;
-    padding: 20px;
-  }
+.code-box {
+background:var(--surface); border:1.5px dashed var(--accent);
+border-radius:14px; padding:18px; text-align:center; margin-bottom:16px;
+}
+.code-box .lbl { font-size:12px; color:var(--muted); margin-bottom:5px; }
+.code-box .code { font-size:34px; font-weight:900; letter-spacing:10px; color:var(--accent); font-family:monospace; }
+.copy-btn {
+display:inline-flex; align-items:center; gap:6px; margin-top:10px;
+background:rgba(108,99,255,.15); border:1px solid rgba(108,99,255,.3);
+color:var(--accent); padding:6px 14px; border-radius:8px; font-size:13px;
+cursor:pointer; font-family:'Tajawal',sans-serif; transition:all .2s;
+}
+.copy-btn:hover { background:rgba(108,99,255,.25); }
 
-  /* ===== LOGO ===== */
-  .logo {
-    text-align: center;
-    margin-bottom: 36px;
-  }
-  .logo-icon {
-    width: 64px; height: 64px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 20px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    margin-bottom: 12px;
-    box-shadow: var(--glow), 0 8px 32px rgba(0,0,0,0.4);
-    animation: pulse-logo 3s ease-in-out infinite;
-  }
-  @keyframes pulse-logo {
-    0%,100% { transform: scale(1); box-shadow: var(--glow), 0 8px 32px rgba(0,0,0,0.4); }
-    50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(108,99,255,0.5), 0 8px 32px rgba(0,0,0,0.4); }
-  }
-  .logo h1 {
-    font-size: 28px;
-    font-weight: 900;
-    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.5px;
-  }
-  .logo p {
-    color: var(--muted);
-    font-size: 14px;
-    margin-top: 4px;
-    font-weight: 300;
-  }
+.dots { display:flex; align-items:center; justify-content:center; gap:8px; padding:12px 0; }
+.dots span { width:8px; height:8px; border-radius:50%; background:var(--accent); animation:dot 1.2s ease-in-out infinite; }
+.dots span:nth-child(2){animation-delay:.2s} .dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1.2);opacity:1}}
 
-  /* ===== CARD ===== */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 32px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    backdrop-filter: blur(10px);
-  }
+#callScreen { display:none; }
+.status-bar {
+background:var(--surface); border:1px solid var(--border); border-radius:11px;
+padding:11px 15px; display:flex; align-items:center; justify-content:space-between;
+margin-bottom:14px; font-size:13px;
+}
+.dg { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); display:inline-block; margin-left:7px; animation:blink 1.5s ease-in-out infinite; }
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.vgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.vbox { background:var(--surface); border:1px solid var(--border); border-radius:14px; aspect-ratio:4/3; overflow:hidden; position:relative; }
+.vbox video { width:100%; height:100%; object-fit:cover; transform:scaleX(-1); }
+.ntag { position:absolute; bottom:7px; right:7px; background:rgba(0,0,0,.7); backdrop-filter:blur(8px); padding:3px 9px; border-radius:7px; font-size:11px; }
+.novid { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--muted); gap:7px; }
+.av { width:50px; height:50px; border-radius:50%; background:linear-gradient(135deg,var(--accent),var(--accent2)); display:flex; align-items:center; justify-content:center; font-size:22px; animation:breathe 2s ease-in-out infinite; }
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.ctrls { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.cb { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:13px 8px; display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer; transition:all .2s; color:var(--text); font-family:'Tajawal',sans-serif; font-size:11px; }
+.cb:hover { border-color:var(--accent); background:rgba(108,99,255,.1); }
+.cb.off { background:rgba(255,71,87,.15); border-color:#ff4757; color:#ff4757; }
+.cb.end { background:linear-gradient(135deg,#ff4757,#ff6584); border:none; color:#fff; grid-column:span 2; }
+.cb .em { font-size:19px; }
 
-  .section-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--muted);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-  }
+.toast {
+position:fixed; top:18px; left:50%; transform:translateX(-50%) translateY(-80px);
+background:var(--card); border:1px solid var(--border); border-radius:11px;
+padding:11px 20px; font-size:14px; z-index:1000; transition:transform .3s;
+box-shadow:0 8px 30px rgba(0,0,0,.4);
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+.overlay {
+display:none; position:fixed; inset:0; background:rgba(10,10,15,.92);
+z-index:100; align-items:center; justify-content:center;
+flex-direction:column; gap:14px; backdrop-filter:blur(10px);
+}
+.overlay.show { display:flex; }
+.spinner { width:44px; height:44px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  /* ===== INPUTS ===== */
-  .input-group {
-    margin-bottom: 16px;
-  }
-  .input-group label {
-    display: block;
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    font-weight: 500;
-  }
-  .input-wrap {
-    position: relative;
-  }
-  .input-wrap .icon {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 16px;
-    pointer-events: none;
-  }
-  input {
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 13px 42px 13px 16px;
-    color: var(--text);
-    font-family: 'Tajawal', sans-serif;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    direction: rtl;
-  }
-  input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
-  }
-  input::placeholder { color: var(--muted); }
-
-  /* ===== BUTTONS ===== */
-  .btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    font-family: 'Tajawal', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), #8b7fff);
-    color: #fff;
-    box-shadow: 0 4px 20px rgba(108,99,255,0.4);
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(108,99,255,0.5); }
-  .btn-primary:active { transform: translateY(0); }
-  .btn-outline {
-    background: transparent;
-    color: var(--accent);
-    border: 1.5px solid var(--accent);
-  }
-  .btn-outline:hover { background: rgba(108,99,255,0.1); }
-  .btn-danger {
-    background: linear-gradient(135deg, #ff4757, #ff6584);
-    color: #fff;
-    box-shadow: 0 4px 20px rgba(255,71,87,0.3);
-  }
-
-  .divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 20px 0;
-  }
-  .divider::before, .divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-  .divider span { color: var(--muted); font-size: 13px; }
-
-  /* ===== ROOM CODE ===== */
-  .room-code-display {
-    background: var(--surface);
-    border: 1.5px dashed var(--accent);
-    border-radius: 14px;
-    padding: 18px;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  .room-code-display .label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-  .room-code-display .code {
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: 8px;
-    color: var(--accent);
-    font-family: monospace;
-  }
-  .copy-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 10px;
-    background: rgba(108,99,255,0.15);
-    border: 1px solid rgba(108,99,255,0.3);
-    color: var(--accent);
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    cursor: pointer;
-    font-family: 'Tajawal', sans-serif;
-    transition: all 0.2s;
-  }
-  .copy-btn:hover { background: rgba(108,99,255,0.25); }
-
-  /* ===== CALL SCREEN ===== */
-  #callScreen { display: none; }
-
-  .videos-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-  .video-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    aspect-ratio: 4/3;
-    overflow: hidden;
-    position: relative;
-  }
-  .video-box video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scaleX(-1);
-  }
-  .video-box .name-tag {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(10px);
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 500;
-  }
-  .video-box .no-video {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: var(--muted);
-    gap: 8px;
-  }
-  .avatar-circle {
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    animation: breathe 2s ease-in-out infinite;
-  }
-  @keyframes breathe {
-    0%,100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
-  }
-
-  .status-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    font-size: 13px;
-  }
-  .status-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 8px var(--green);
-    animation: blink 1.5s ease-in-out infinite;
-    display: inline-block;
-    margin-left: 8px;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  .controls {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-  }
-  .ctrl-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 14px 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: var(--text);
-    font-family: 'Tajawal', sans-serif;
-    font-size: 11px;
-  }
-  .ctrl-btn:hover { border-color: var(--accent); background: rgba(108,99,255,0.1); }
-  .ctrl-btn.active { background: rgba(255,71,87,0.15); border-color: #ff4757; color: #ff4757; }
-  .ctrl-btn.end { background: linear-gradient(135deg, #ff4757, #ff6584); border: none; color: #fff; grid-column: span 2; }
-  .ctrl-btn .emoji { font-size: 20px; }
-
-  /* ===== WAITING ===== */
-  .waiting-pulse {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--muted);
-    font-size: 13px;
-  }
-  .pulse-dots span {
-    display: inline-block;
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-    animation: dot-bounce 1.2s ease-in-out infinite;
-  }
-  .pulse-dots span:nth-child(2) { animation-delay: 0.2s; }
-  .pulse-dots span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes dot-bounce { 0%,80%,100%{transform:scale(0.8);opacity:0.5} 40%{transform:scale(1.2);opacity:1} }
-
-  .toast {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-80px);
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 20px;
-    font-size: 14px;
-    z-index: 1000;
-    transition: transform 0.3s ease;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-
-  /* Connecting overlay */
-  .connecting-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(10,10,15,0.9);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 16px;
-    backdrop-filter: blur(10px);
-  }
-  .connecting-overlay.show { display: flex; }
-  .spinner {
-    width: 48px; height: 48px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  @media (max-width: 400px) {
-    .videos-grid { grid-template-columns: 1fr; }
-    .controls { grid-template-columns: repeat(2, 1fr); }
-    .ctrl-btn.end { grid-column: span 2; }
-  }
+/* Setup screen */
+.setup-card { background:var(--card); border:1px solid #ff6d0055; border-radius:22px; padding:24px; margin-top:16px; }
+.setup-card h3 { color:#ffaa44; font-size:15px; margin-bottom:12px; }
+.setup-card ol { padding-right:20px; color:var(--muted); font-size:13px; line-height:2; }
+.setup-card a { color:var(--accent); }
+.setup-card code { background:var(--surface); border-radius:5px; padding:1px 6px; font-size:12px; color:var(--green); }
 </style>
-</head>
-<body>
 
-<div id="toast" class="toast">📋 تم النسخ!</div>
-
-<div id="connectingOverlay" class="connecting-overlay">
-  <div class="spinner"></div>
-  <p style="color:var(--muted);font-size:14px">جاري الاتصال...</p>
+</head>  
+<body>  <div id="toast" class="toast"></div>  
+<div id="overlay" class="overlay">  
+  <div class="spinner"></div>  
+  <p id="overlayMsg" style="color:var(--muted);font-size:14px">جاري الاتصال...</p>  
+</div>  <div class="container">    <!-- HOME -->    <div id="homeScreen">  
+    <div class="logo">  
+      <div class="logo-icon">📞</div>  
+      <h1>كلّمني</h1>  
+      <p>اتصال فيديو مباشر مع صديقك</p>  
+    </div>  
+    <div class="card">  
+      <div class="ig">  
+        <label>اسمك</label>  
+        <div class="iw"><span class="ic">👤</span>  
+          <input id="myName" type="text" placeholder="أدخل اسمك" maxlength="20">  
+        </div>  
+      </div>  
+      <button class="btn btn-p" onclick="createRoom()">🎲 إنشاء غرفة جديدة</button>  
+      <div class="divider"><span>أو انضم لغرفة</span></div>  
+      <div class="ig">  
+        <label>كود الغرفة</label>  
+        <div class="iw"><span class="ic">🔑</span>  
+          <input id="roomInput" type="text" placeholder="أدخل الكود هنا" maxlength="6"  
+            style="letter-spacing:5px;text-align:center;text-transform:uppercase"  
+            onkeyup="this.value=this.value.toUpperCase()"  
+            onkeypress="if(event.key==='Enter')joinRoom()">  
+        </div>  
+      </div>  
+      <button class="btn btn-o" onclick="joinRoom()">🚪 دخول الغرفة</button>  
+    </div>  <!-- Firebase setup instructions -->  
+<div class="setup-card">  
+  <h3>⚙️ إعداد مطلوب — Firebase (مجاني)</h3>  
+  <ol>  
+    <li>اذهب إلى <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></li>  
+    <li>أنشئ مشروع جديد</li>  
+    <li>Build → Realtime Database → Create Database (test mode)</li>  
+    <li>Project Settings → Web App → انسخ <code>firebaseConfig</code></li>  
+    <li>افتح هذا الملف في محرر نصوص والصق الـ config في المكان المحدد</li>  
+  </ol>  
 </div>
 
-<div class="container">
-
-  <!-- HOME SCREEN -->
-  <div id="homeScreen">
-    <div class="logo">
-      <div class="logo-icon">📞</div>
-      <h1>كلّمني</h1>
-      <p>اتصال مباشر مع صديقك</p>
-    </div>
-
-    <div class="card">
-      <p class="section-title">ابدأ جلسة جديدة</p>
-      <div class="input-group">
-        <label>اسمك</label>
-        <div class="input-wrap">
-          <span class="icon">👤</span>
-          <input id="myName" type="text" placeholder="اكتب اسمك" maxlength="20">
-        </div>
-      </div>
-      <button class="btn btn-primary" onclick="createRoom()">
-        <span>🎲</span> إنشاء غرفة جديدة
-      </button>
-
-      <div class="divider"><span>أو</span></div>
-
-      <p class="section-title">انضم لغرفة</p>
-      <div class="input-group">
-        <label>كود الغرفة</label>
-        <div class="input-wrap">
-          <span class="icon">🔑</span>
-          <input id="roomInput" type="text" placeholder="أدخل الكود" maxlength="6" style="letter-spacing:4px;text-align:center">
-        </div>
-      </div>
-      <button class="btn btn-outline" onclick="joinRoom()">
-        <span>🚪</span> الدخول للغرفة
-      </button>
-    </div>
-  </div>
-
-  <!-- WAITING SCREEN -->
-  <div id="waitingScreen" style="display:none">
-    <div class="logo">
-      <div class="logo-icon">⏳</div>
-      <h1>في انتظار صديقك</h1>
-      <p id="waitingName" style="color:var(--muted)"></p>
-    </div>
-
-    <div class="card">
-      <div class="room-code-display">
-        <div class="label">شارك هذا الكود مع صديقك</div>
-        <div class="code" id="displayCode">------</div>
-        <button class="copy-btn" onclick="copyCode()">📋 نسخ الكود</button>
-      </div>
-
-      <div style="text-align:center; padding: 12px 0;">
-        <div class="waiting-pulse">
-          <div class="pulse-dots">
-            <span></span><span></span><span></span>
-          </div>
-          <span style="margin-right:8px">في انتظار الاتصال</span>
-        </div>
-      </div>
-
-      <div class="divider"><span>أو</span></div>
-
-      <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:14px">
-        شارك رابط الغرفة مباشرة
-      </p>
-      <button class="btn btn-outline" onclick="copyLink()" style="margin-bottom:12px">
-        🔗 نسخ رابط الغرفة
-      </button>
-      <button class="btn btn-danger" onclick="cancelRoom()">
-        ❌ إلغاء
-      </button>
-    </div>
-  </div>
-
-  <!-- CALL SCREEN -->
-  <div id="callScreen">
-    <div class="logo" style="margin-bottom:20px">
-      <h1 style="font-size:22px">🟢 الاتصال نشط</h1>
-    </div>
-
-    <div class="card" style="padding:20px">
-      <div class="status-bar">
-        <span><span class="status-dot"></span> متصل</span>
-        <span id="callTimer" style="font-family:monospace;color:var(--accent)">00:00</span>
-        <span id="remoteNameTag" style="color:var(--muted)">صديقك</span>
-      </div>
-
-      <div class="videos-grid">
-        <div class="video-box">
-          <video id="localVideo" autoplay muted playsinline></video>
-          <div class="name-tag" id="localNameTag">أنت</div>
-        </div>
-        <div class="video-box" id="remoteVideoBox">
-          <div class="no-video" id="remoteNoVideo">
-            <div class="avatar-circle">👤</div>
-            <span style="font-size:12px">في انتظار الفيديو</span>
-          </div>
-          <video id="remoteVideo" autoplay playsinline style="display:none"></video>
-          <div class="name-tag" id="remoteNameLabel" style="display:none">صديقك</div>
-        </div>
-      </div>
-
-      <div class="controls">
-        <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()">
-          <span class="emoji">🎤</span>
-          <span>صوت</span>
-        </button>
-        <button class="ctrl-btn" id="videoBtn" onclick="toggleVideo()">
-          <span class="emoji">📹</span>
-          <span>كاميرا</span>
-        </button>
-        <button class="ctrl-btn" id="speakerBtn" onclick="toggleSpeaker()">
-          <span class="emoji">🔊</span>
-          <span>سماعة</span>
-        </button>
-        <button class="ctrl-btn end" onclick="endCall()">
-          <span class="emoji">📵</span>
-          <span>إنهاء الاتصال</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<script>
-// =============================================
-// WEBRTC P2P CHAT USING PEERJS (serverless-friendly)
-// =============================================
-
-// We'll use PeerJS CDN for easy WebRTC
-const PEERJS_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js';
-
-let peer = null;
-let conn = null;
-let call = null;
-let localStream = null;
-let myName = '';
-let roomCode = '';
-let callInterval = null;
-let callSeconds = 0;
-let isMuted = false;
-let isVideoOff = false;
-
-// Load PeerJS
-function loadPeerJS(cb) {
-  if (window.Peer) return cb();
-  const s = document.createElement('script');
-  s.src = PEERJS_CDN;
-  s.onload = cb;
-  s.onerror = () => showToast('⚠️ تحقق من الإنترنت');
-  document.head.appendChild(s);
-}
-
-function generateCode() {
-  return Math.random().toString(36).substring(2,8).toUpperCase();
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-function showConnecting(show) {
-  document.getElementById('connectingOverlay').classList.toggle('show', show);
-}
-
-// ===== GET MEDIA =====
-async function getMedia(video = true) {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video, audio: true });
-    return stream;
-  } catch {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true });
-      return stream;
-    } catch(e) {
-      showToast('❌ لا يمكن الوصول للكاميرا/الميكروفون');
-      return null;
-    }
-  }
-}
-
-// ===== CREATE ROOM =====
-function createRoom() {
-  myName = document.getElementById('myName').value.trim() || 'أنت';
-  roomCode = generateCode();
-
-  loadPeerJS(() => {
-    peer = new Peer(roomCode, { debug: 0 });
-
-    peer.on('open', id => {
-      document.getElementById('displayCode').textContent = id;
-      document.getElementById('waitingName').textContent = `مرحباً ${myName}! شارك الكود مع صديقك`;
-      document.getElementById('homeScreen').style.display = 'none';
-      document.getElementById('waitingScreen').style.display = '';
-    });
-
-    peer.on('call', async incoming => {
-      localStream = await getMedia();
-      if (!localStream) return;
-      incoming.answer(localStream);
-      call = incoming;
-      setupCall(call);
-    });
-
-    peer.on('connection', c => {
-      conn = c;
-      c.on('data', handleData);
-    });
-
-    peer.on('error', e => {
-      if (e.type === 'unavailable-id') {
-        roomCode = generateCode();
-        peer.destroy();
-        createRoom();
-      }
-    });
-  });
-}
-
-// ===== JOIN ROOM =====
-async function joinRoom() {
-  const code = document.getElementById('roomInput').value.trim().toUpperCase();
-  if (code.length < 4) { showToast('⚠️ أدخل الكود كاملاً'); return; }
-  myName = document.getElementById('myName').value.trim() || 'ضيف';
-
-  showConnecting(true);
-
-  localStream = await getMedia();
-  if (!localStream) { showConnecting(false); return; }
-
-  loadPeerJS(() => {
-    peer = new Peer({ debug: 0 });
-
-    peer.on('open', () => {
-      roomCode = code;
-      conn = peer.connect(code);
-      conn.on('open', () => {
-        conn.send({ type: 'name', name: myName });
-      });
-      conn.on('data', handleData);
-
-      call = peer.call(code, localStream);
-      setupCall(call);
-    });
-
-    peer.on('error', () => {
-      showConnecting(false);
-      showToast('❌ لم يتم العثور على الغرفة، تحقق من الكود');
-    });
-  });
-}
-
-function handleData(data) {
-  if (data.type === 'name') {
-    document.getElementById('remoteNameTag').textContent = data.name;
-    document.getElementById('remoteNameLabel').textContent = data.name;
-  }
-}
-
-function setupCall(c) {
-  c.on('stream', remoteStream => {
-    showConnecting(false);
-    const remoteVideo = document.getElementById('remoteVideo');
-    remoteVideo.srcObject = remoteStream;
-    remoteVideo.style.display = '';
-    document.getElementById('remoteNoVideo').style.display = 'none';
-    document.getElementById('remoteNameLabel').style.display = '';
-
-    // Show call screen
-    document.getElementById('homeScreen').style.display = 'none';
-    document.getElementById('waitingScreen').style.display = 'none';
-    document.getElementById('callScreen').style.display = '';
-
-    // Local video
-    const localVideo = document.getElementById('localVideo');
-    localVideo.srcObject = localStream;
-    document.getElementById('localNameTag').textContent = myName;
-
-    // Send name
-    if (conn && conn.open) conn.send({ type: 'name', name: myName });
-
-    // Start timer
-    callSeconds = 0;
-    callInterval = setInterval(() => {
-      callSeconds++;
-      const m = String(Math.floor(callSeconds/60)).padStart(2,'0');
-      const s = String(callSeconds%60).padStart(2,'0');
-      document.getElementById('callTimer').textContent = `${m}:${s}`;
-    }, 1000);
-  });
-
-  c.on('close', () => {
-    showToast('📵 انتهى الاتصال من الطرف الآخر');
-    setTimeout(endCall, 1500);
-  });
-  c.on('error', () => {
-    showConnecting(false);
-    showToast('❌ خطأ في الاتصال');
-  });
-}
-
-// ===== CONTROLS =====
-function toggleMute() {
-  isMuted = !isMuted;
-  if (localStream) localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
-  const btn = document.getElementById('muteBtn');
-  btn.querySelector('.emoji').textContent = isMuted ? '🔇' : '🎤';
-  btn.querySelector('span:last-child').textContent = isMuted ? 'كتم' : 'صوت';
-  btn.classList.toggle('active', isMuted);
-}
-
-function toggleVideo() {
-  isVideoOff = !isVideoOff;
-  if (localStream) localStream.getVideoTracks().forEach(t => t.enabled = !isVideoOff);
-  const btn = document.getElementById('videoBtn');
-  btn.querySelector('.emoji').textContent = isVideoOff ? '🚫' : '📹';
-  btn.querySelector('span:last-child').textContent = isVideoOff ? 'إيقاف' : 'كاميرا';
-  btn.classList.toggle('active', isVideoOff);
-}
-
-function toggleSpeaker() {
-  const rv = document.getElementById('remoteVideo');
-  rv.muted = !rv.muted;
-  const btn = document.getElementById('speakerBtn');
-  btn.querySelector('.emoji').textContent = rv.muted ? '🔕' : '🔊';
-  btn.classList.toggle('active', rv.muted);
-}
-
-function endCall() {
-  clearInterval(callInterval);
-  if (call) call.close();
-  if (conn) conn.close();
-  if (peer) peer.destroy();
-  if (localStream) localStream.getTracks().forEach(t => t.stop());
-  peer = null; call = null; conn = null; localStream = null;
-
-  document.getElementById('callScreen').style.display = 'none';
-  document.getElementById('waitingScreen').style.display = 'none';
-  document.getElementById('homeScreen').style.display = '';
-  showToast('👋 تم إنهاء الاتصال');
-}
-
-function cancelRoom() {
-  if (peer) peer.destroy();
-  peer = null;
-  document.getElementById('waitingScreen').style.display = 'none';
-  document.getElementById('homeScreen').style.display = '';
-}
-
-function copyCode() {
-  navigator.clipboard.writeText(document.getElementById('displayCode').textContent)
-    .then(() => showToast('📋 تم نسخ الكود!'))
-    .catch(() => showToast('الكود: ' + document.getElementById('displayCode').textContent));
-}
-
-function copyLink() {
-  const code = document.getElementById('displayCode').textContent;
-  const url = `${location.href.split('?')[0]}?room=${code}`;
-  navigator.clipboard.writeText(url)
-    .then(() => showToast('🔗 تم نسخ الرابط!'))
-    .catch(() => showToast('تعذر النسخ'));
-}
-
-// Auto-join from URL
-window.onload = () => {
-  const params = new URLSearchParams(location.search);
-  const room = params.get('room');
-  if (room) {
-    document.getElementById('roomInput').value = room;
-    showToast('🔑 كود الغرفة جاهز، أدخل اسمك ثم ادخل!');
-  }
-};
-
-// Enter key support
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    if (document.getElementById('roomInput').value) joinRoom();
-  }
-});
-</script>
-</body>
+  </div>    <!-- WAITING -->    <div id="waitingScreen" style="display:none">  
+    <div class="logo">  
+      <div class="logo-icon">⏳</div>  
+      <h1>في انتظار صديقك</h1>  
+      <p id="waitSub" style="color:var(--muted)">شارك الكود معه</p>  
+    </div>  
+    <div class="card">  
+      <div class="code-box">  
+        <div class="lbl">شارك هذا الكود</div>  
+        <div class="code" id="displayCode">------</div>  
+        <button class="copy-btn" onclick="copyCode()">📋 نسخ الكود</button>  
+      </div>  
+      <div class="dots"><span></span><span></span><span></span></div>  
+      <p style="font-size:12px;color:var(--muted);text-align:center;margin:6px 0 16px">  
+        في انتظار دخول صديقك...  
+      </p>  
+      <button class="btn btn-d" onclick="cancelWait()">❌ إلغاء</button>  
+    </div>  
+  </div>    <!-- CALL -->    <div id="callScreen">  
+    <div class="logo" style="margin-bottom:16px">  
+      <h1 style="font-size:20px">🟢 الاتصال نشط</h1>  
+    </div>  
+    <div class="card" style="padding:18px">  
+      <div class="status-bar">  
+        <span><span class="dg"></span> متصل</span>  
+        <span id="callTimer" style="font-family:monospace;color:var(--accent)">00:00</span>  
+        <span id="remoteName" style="color:var(--muted)">صديقك</span>  
+      </div>  
+      <div class="vgrid">  
+        <div class="vbox">  
+          <video id="localVideo" autoplay muted playsinline></video>  
+          <div class="ntag" id="localTag">أنت</div>  
+        </div>  
+        <div class="vbox">  
+          <div class="novid" id="remoteNoVid">  
+            <div class="av">👤</div>  
+            <span style="font-size:11px">جاري التوصيل...</span>  
+          </div>  
+          <video id="remoteVideo" autoplay playsinline style="display:none"></video>  
+          <div class="ntag" id="remoteTag" style="display:none">صديقك</div>  
+        </div>  
+      </div>  
+      <div class="ctrls">  
+        <button class="cb" id="muteBtn" onclick="toggleMute()"><span class="em">🎤</span><span>صوت</span></button>  
+        <button class="cb" id="vidBtn"  onclick="toggleVideo()"><span class="em">📹</span><span>كاميرا</span></button>  
+        <button class="cb" id="spkBtn"  onclick="toggleSpeaker()"><span class="em">🔊</span><span>سماعة</span></button>  
+        <button class="cb end" onclick="endCall()"><span class="em">📵</span><span>إنهاء</span></button>  
+      </div>  
+    </div>  
+  </div>  </div>  <!-- ===== Firebase + WebRTC ===== -->  <script type="module">  
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";  
+import { getDatabase, ref, set, get, onValue, remove, push, onChildAdded }  
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";  
+  
+// ╔══════════════════════════════════════════════════════════════════╗  
+// ║  ضع هنا بيانات مشروع Firebase الخاص بك                         ║  
+// ╚══════════════════════════════════════════════════════════════════╝  
+const firebaseConfig = {  
+  apiKey: "AIzaSyDyp2F0VAuO7udhWemh35_WozLcmfXiDY0",  
+  authDomain: "sa-calls.firebaseapp.com",  
+  databaseURL: "https://sa-calls-default-rtdb.firebaseio.com",  
+  projectId: "sa-calls",  
+  storageBucket: "sa-calls.firebasestorage.app",  
+  messagingSenderId: "393379367558",  
+  appId: "1:393379367558:web:c493fe0be665a6ca521f07"  
+};  
+  
+// ─── init ─────────────────────────────────────────────────────────  
+let app, db;  
+try {  
+  if (firebaseConfig.apiKey === "PASTE_YOUR_API_KEY_HERE") throw new Error("not configured");  
+  app = initializeApp(firebaseConfig);  
+  db  = getDatabase(app);  
+} catch {  
+  showToast("⚠️ يجب إعداد Firebase أولاً — اقرأ التعليمات أدناه");  
+}  
+  
+// ─── state ────────────────────────────────────────────────────────  
+let myName='', roomCode='', pc=null, localStream=null;  
+let callInterval=null, callSeconds=0;  
+let isMuted=false, isVideoOff=false, isCallee=false;  
+  
+const ICE = [  
+  { urls:'stun:stun.l.google.com:19302' },  
+  { urls:'stun:stun1.l.google.com:19302' },  
+  { urls:'stun:stun2.l.google.com:19302' },  
+];  
+  
+// ─── helpers ─────────────────────────────────────────────────────  
+function showToast(msg, dur=3000) {  
+  const t=document.getElementById('toast');  
+  t.textContent=msg; t.classList.add('show');  
+  setTimeout(()=>t.classList.remove('show'), dur);  
+}  
+function showOv(msg='جاري الاتصال...') {  
+  document.getElementById('overlayMsg').textContent=msg;  
+  document.getElementById('overlay').classList.add('show');  
+}  
+function hideOv() { document.getElementById('overlay').classList.remove('show'); }  
+function show(id){ document.getElementById(id).style.display=''; }  
+function hide(id){ document.getElementById(id).style.display='none'; }  
+function genCode(){ return Math.random().toString(36).substring(2,8).toUpperCase(); }  
+  
+async function getMedia() {  
+  try { return await navigator.mediaDevices.getUserMedia({video:true,audio:true}); }  
+  catch { try { return await navigator.mediaDevices.getUserMedia({video:false,audio:true}); }  
+    catch { showToast('❌ يجب السماح بالكاميرا/الميكروفون'); return null; } }  
+}  
+  
+// ─── WebRTC ───────────────────────────────────────────────────────  
+function makePC() {  
+  const p = new RTCPeerConnection({ iceServers:ICE });  
+  
+  p.onicecandidate = async e => {  
+    if (!e.candidate || !db) return;  
+    const path = isCallee  
+      ? `rooms/${roomCode}/calleeCandidates`  
+      : `rooms/${roomCode}/callerCandidates`;  
+    await push(ref(db,path), e.candidate.toJSON());  
+  };  
+  
+  p.ontrack = e => {  
+    const rv = document.getElementById('remoteVideo');  
+    if (!rv.srcObject) rv.srcObject = e.streams[0];  
+    rv.style.display=''; hide('remoteNoVid'); show('remoteTag');  
+  };  
+  
+  p.onconnectionstatechange = () => {  
+    if (['disconnected','failed','closed'].includes(p.connectionState)) {  
+      showToast('📵 انقطع الاتصال');  
+      setTimeout(endCall, 1500);  
+    }  
+  };  
+  return p;  
+}  
+  
+function listenCandidates(path) {  
+  if (!db) return;  
+  onChildAdded(ref(db,path), snap => {  
+    const c=snap.val();  
+    if (pc && c) pc.addIceCandidate(new RTCIceCandidate(c)).catch(()=>{});  
+  });  
+}  
+  
+// ─── CREATE ───────────────────────────────────────────────────────  
+window.createRoom = async () => {  
+  if (!db) { showToast('⚠️ Firebase غير مُهيَّأ، اتبع التعليمات'); return; }  
+  myName = document.getElementById('myName').value.trim() || 'أنت';  
+  roomCode = genCode();  
+  
+  localStream = await getMedia();  
+  if (!localStream) return;  
+  
+  isCallee = false;  
+  pc = makePC();  
+  localStream.getTracks().forEach(t => pc.addTrack(t,localStream));  
+  
+  const offer = await pc.createOffer();  
+  await pc.setLocalDescription(offer);  
+  await set(ref(db,`rooms/${roomCode}`), {  
+    offer:{ type:offer.type, sdp:offer.sdp },  
+    callerName: myName,  
+  });  
+  
+  document.getElementById('displayCode').textContent = roomCode;  
+  document.getElementById('waitSub').textContent = `مرحباً ${myName}! شارك الكود مع صديقك`;  
+  hide('homeScreen'); show('waitingScreen');  
+  
+  // listen for answer  
+  onValue(ref(db,`rooms/${roomCode}/answer`), async snap => {  
+    if (snap.exists() && pc && pc.signalingState !== 'stable') {  
+      await pc.setRemoteDescription(new RTCSessionDescription(snap.val()));  
+      startCallUI();  
+    }  
+  });  
+  
+  // listen for callee name  
+  onValue(ref(db,`rooms/${roomCode}/calleeName`), snap => {  
+    if (snap.exists()) {  
+      document.getElementById('remoteName').textContent = snap.val();  
+      document.getElementById('remoteTag').textContent  = snap.val();  
+    }  
+  });  
+  
+  listenCandidates(`rooms/${roomCode}/calleeCandidates`);  
+};  
+  
+// ─── JOIN ─────────────────────────────────────────────────────────  
+window.joinRoom = async () => {  
+  if (!db) { showToast('⚠️ Firebase غير مُهيَّأ، اتبع التعليمات'); return; }  
+  const code = document.getElementById('roomInput').value.trim().toUpperCase();  
+  if (code.length < 4) { showToast('⚠️ أدخل الكود كاملاً'); return; }  
+  myName  = document.getElementById('myName').value.trim() || 'ضيف';  
+  roomCode = code;  
+  
+  showOv('جاري البحث عن الغرفة...');  
+  
+  const snap = await get(ref(db,`rooms/${roomCode}/offer`));  
+  if (!snap.exists()) { hideOv(); showToast('❌ الغرفة غير موجودة، تحقق من الكود'); return; }  
+  
+  localStream = await getMedia();  
+  if (!localStream) { hideOv(); return; }  
+  
+  isCallee = true;  
+  pc = makePC();  
+  localStream.getTracks().forEach(t => pc.addTrack(t,localStream));  
+  
+  await pc.setRemoteDescription(new RTCSessionDescription(snap.val()));  
+  const answer = await pc.createAnswer();  
+  await pc.setLocalDescription(answer);  
+  await set(ref(db,`rooms/${roomCode}/answer`), { type:answer.type, sdp:answer.sdp });  
+  await set(ref(db,`rooms/${roomCode}/calleeName`), myName);  
+  
+  const callerSnap = await get(ref(db,`rooms/${roomCode}/callerName`));  
+  if (callerSnap.exists()) {  
+    document.getElementById('remoteName').textContent = callerSnap.val();  
+    document.getElementById('remoteTag').textContent  = callerSnap.val();  
+  }  
+  
+  listenCandidates(`rooms/${roomCode}/callerCandidates`);  
+  hideOv();  
+  startCallUI();  
+};  
+  
+// ─── call UI ─────────────────────────────────────────────────────  
+function startCallUI() {  
+  hide('homeScreen'); hide('waitingScreen'); show('callScreen');  
+  document.getElementById('localVideo').srcObject = localStream;  
+  document.getElementById('localTag').textContent = myName;  
+  callSeconds=0;  
+  callInterval = setInterval(()=>{  
+    callSeconds++;  
+    const m=String(Math.floor(callSeconds/60)).padStart(2,'0');  
+    const s=String(callSeconds%60).padStart(2,'0');  
+    document.getElementById('callTimer').textContent=`${m}:${s}`;  
+  },1000);  
+}  
+  
+// ─── controls ────────────────────────────────────────────────────  
+window.toggleMute = () => {  
+  isMuted=!isMuted;  
+  localStream?.getAudioTracks().forEach(t=>t.enabled=!isMuted);  
+  const b=document.getElementById('muteBtn');  
+  b.querySelector('.em').textContent=isMuted?'🔇':'🎤';  
+  b.querySelector('span:last-child').textContent=isMuted?'كتم':'صوت';  
+  b.classList.toggle('off',isMuted);  
+};  
+window.toggleVideo = () => {  
+  isVideoOff=!isVideoOff;  
+  localStream?.getVideoTracks().forEach(t=>t.enabled=!isVideoOff);  
+  const b=document.getElementById('vidBtn');  
+  b.querySelector('.em').textContent=isVideoOff?'🚫':'📹';  
+  b.querySelector('span:last-child').textContent=isVideoOff?'إيقاف':'كاميرا';  
+  b.classList.toggle('off',isVideoOff);  
+};  
+window.toggleSpeaker = () => {  
+  const rv=document.getElementById('remoteVideo');  
+  rv.muted=!rv.muted;  
+  const b=document.getElementById('spkBtn');  
+  b.querySelector('.em').textContent=rv.muted?'🔕':'🔊';  
+  b.classList.toggle('off',rv.muted);  
+};  
+window.endCall = async () => {  
+  clearInterval(callInterval);  
+  pc?.close(); pc=null;  
+  localStream?.getTracks().forEach(t=>t.stop()); localStream=null;  
+  if (db&&roomCode) remove(ref(db,`rooms/${roomCode}`)).catch(()=>{});  
+  hide('callScreen'); hide('waitingScreen'); show('homeScreen');  
+  showToast('👋 تم إنهاء الاتصال');  
+};  
+window.cancelWait = async () => {  
+  pc?.close(); pc=null;  
+  localStream?.getTracks().forEach(t=>t.stop()); localStream=null;  
+  if (db&&roomCode) remove(ref(db,`rooms/${roomCode}`)).catch(()=>{});  
+  hide('waitingScreen'); show('homeScreen');  
+};  
+window.copyCode = () => {  
+  navigator.clipboard.writeText(roomCode)  
+    .then(()=>showToast('📋 تم نسخ الكود!'))  
+    .catch(()=>showToast('الكود: '+roomCode));  
+};  
+  
+// auto-fill from URL  
+const p=new URLSearchParams(location.search);  
+if(p.get('room')){ document.getElementById('roomInput').value=p.get('room').toUpperCase(); showToast('🔑 الكود جاهز، أدخل اسمك!'); }  
+</script>  </body>  
 </html>
