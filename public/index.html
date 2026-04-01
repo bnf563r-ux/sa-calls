@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Zoom Clone</title>
+  <style>
+    body { text-align: center; font-family: Arial; }
+    video { width: 300px; margin: 10px; border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>📹 اتصال فيديو</h2>
+
+<input id="roomId" placeholder="رمز الغرفة">
+<button onclick="createRoom()">إنشاء غرفة</button>
+<button onclick="joinRoom()">انضم</button>
+
+<br><br>
+
+<video id="localVideo" autoplay muted playsinline></video>
+<video id="remoteVideo" autoplay playsinline></video>
+
+<script src="https://unpkg.com/simple-peer@9.11.1/simplepeer.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
