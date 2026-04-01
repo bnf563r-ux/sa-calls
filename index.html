@@ -503,7 +503,19 @@
   // ─── Init Peer ───
   function initPeer(isHost, hostId) {
     if (peer) { peer.destroy(); }
-    peer = new Peer(); // always auto-generated — avoids unavailable-id errors
+
+    // TURN servers needed for audio across different networks (NAT traversal)
+    const iceConfig = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'turn:openrelay.metered.ca:80',        username: 'openrelayproject', credential: 'openrelayproject' },
+        { urls: 'turn:openrelay.metered.ca:443',       username: 'openrelayproject', credential: 'openrelayproject' },
+        { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+      ]
+    };
+
+    peer = new Peer({ config: iceConfig });
 
     peer.on('error', err => {
       showToast('خطأ: ' + err.type);
@@ -574,11 +586,40 @@
   }
 
   function playRemoteStream(stream) {
-    const audio = new Audio();
+    // Remove old audio elements first
+    remoteAudios.forEach(a => { try { a.pause(); a.srcObject = null; a.remove(); } catch(e){} });
+    remoteAudios = [];
+
+    const audio = document.createElement('audio');
     audio.srcObject = stream;
     audio.autoplay = true;
-    document.body.appendChild(audio); // must be in DOM for autoplay on some browsers
+    audio.setAttribute('playsinline', '');   // iOS fix
+    audio.volume = 1.0;
+    document.body.appendChild(audio);
+
+    // Some browsers block autoplay — try play() explicitly
+    const tryPlay = () => {
+      audio.play().catch(e => {
+        // Show a "tap to hear" overlay if blocked
+        showUnlockBanner(audio);
+      });
+    };
+    tryPlay();
     remoteAudios.push(audio);
+  }
+
+  function showUnlockBanner(audio) {
+    let banner = document.getElementById('unlockBanner');
+    if (banner) return;
+    banner = document.createElement('div');
+    banner.id = 'unlockBanner';
+    banner.style.cssText = 'position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:#3b82f6;color:#fff;padding:12px 24px;border-radius:12px;font-family:Cairo,sans-serif;font-size:0.9rem;cursor:pointer;z-index:999;box-shadow:0 4px 20px rgba(59,130,246,0.5)';
+    banner.textContent = '🔊 اضغط هنا لتشغيل الصوت';
+    banner.onclick = () => {
+      audio.play();
+      banner.remove();
+    };
+    document.body.appendChild(banner);
   }
 
   // ─── Timer ───
