@@ -19,6 +19,7 @@ function createRoom() {
 async function joinRoom() {
     const roomId = document.getElementById("roomId").value;
 
+    // الحصول على الصوت والفيديو
     localStream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true
@@ -29,10 +30,12 @@ async function joinRoom() {
     socket.emit("join-room", roomId);
 }
 
+// عندما ينضم شخص جديد
 socket.on("user-joined", userId => {
     createPeer(userId, true);
 });
 
+// استقبال الإشارات
 socket.on("signal", data => {
     if (!peer) {
         createPeer(data.from, false);
@@ -40,6 +43,7 @@ socket.on("signal", data => {
     peer.signal(data.signal);
 });
 
+// شخص ترك الغرفة
 socket.on("user-left", () => {
     if (peer) {
         peer.destroy();
@@ -48,6 +52,7 @@ socket.on("user-left", () => {
     }
 });
 
+// إنشاء الـ Peer مع STUN + TURN
 function createPeer(userId, initiator) {
     peer = new SimplePeer({
         initiator: initiator,
@@ -55,7 +60,10 @@ function createPeer(userId, initiator) {
         stream: localStream,
         config: {
             iceServers: [
-                { urls: "stun:stun.l.google.com:19302" }
+                { urls: "stun:stun.l.google.com:19302" },  // STUN
+                { urls: "turn:numb.viagenie.ca",          // TURN مجاني
+                  username: "demo@demo.com",
+                  credential: "muazkh" }
             ]
         }
     });
