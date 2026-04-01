@@ -1,64 +1,637 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Voice Chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #060810;
+      --surface: #0d1220;
+      --border: rgba(80,160,255,0.12);
+      --accent: #3b82f6;
+      --accent2: #06b6d4;
+      --green: #22c55e;
+      --red: #ef4444;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --glow: 0 0 40px rgba(59,130,246,0.3);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ─── Animated background ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 20%, rgba(59,130,246,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 80% 80%, rgba(6,182,212,0.07) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Grid overlay ─── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Pages ─── */
+    .page {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .page.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.96);
+    }
+
+    /* ─── HOME PAGE ─── */
+    .logo {
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #fff 30%, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+    .tagline {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 50px;
+      font-weight: 300;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4), var(--glow);
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: none;
+      font-family: 'Cairo', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(59,130,246,0.5); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); border-color: rgba(80,160,255,0.25); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .input-field {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 16px;
+      color: var(--text);
+      font-family: 'Cairo', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+      text-align: right;
+      width: 100%;
+    }
+    .input-field::placeholder { color: var(--muted); }
+    .input-field:focus { border-color: var(--accent); }
+
+    /* ─── CALL PAGE ─── */
+    .call-page {
+      gap: 0;
+      padding: 30px;
+    }
+
+    .call-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 30px;
+    }
+    .call-logo { font-weight: 900; font-size: 1.1rem; color: var(--muted); letter-spacing: -0.5px; }
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.25);
+      color: var(--green);
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+    .status-pill.connecting {
+      background: rgba(245,158,11,0.12);
+      border-color: rgba(245,158,11,0.25);
+      color: #f59e0b;
+    }
+    .status-pill.connecting .status-dot { background: #f59e0b; }
+
+    /* ─── Avatar ring ─── */
+    .avatar-container {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      margin: 0 auto 32px;
+    }
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(59,130,246,0.2);
+      animation: ring-expand 2.5s ease-out infinite;
+    }
+    .ring:nth-child(1) { inset: -20px; animation-delay: 0s; }
+    .ring:nth-child(2) { inset: -40px; animation-delay: 0.6s; }
+    .ring:nth-child(3) { inset: -60px; animation-delay: 1.2s; }
+    @keyframes ring-expand {
+      0% { opacity: 0.6; transform: scale(0.9); }
+      100% { opacity: 0; transform: scale(1); }
+    }
+    .avatar {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3a5f, #0d2040);
+      border: 2px solid rgba(59,130,246,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      box-shadow: 0 0 60px rgba(59,130,246,0.2), inset 0 0 30px rgba(0,0,0,0.3);
+      transition: box-shadow 0.3s;
+    }
+    .avatar.speaking {
+      box-shadow: 0 0 80px rgba(59,130,246,0.5), inset 0 0 30px rgba(0,0,0,0.3);
+      border-color: var(--accent);
+    }
+    .avatar.speaking ~ .ring { animation-duration: 1.2s; border-color: rgba(59,130,246,0.4); }
+
+    /* ─── Caller name & timer ─── */
+    .caller-name {
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+    .call-timer {
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 40px;
+      letter-spacing: 1px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ─── Wave visualizer ─── */
+    .wave-bar-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      height: 40px;
+      margin-bottom: 40px;
+    }
+    .wave-bar {
+      width: 4px;
+      border-radius: 4px;
+      background: linear-gradient(180deg, var(--accent2), var(--accent));
+      animation: wave 1.2s ease-in-out infinite;
+      transform-origin: bottom;
+    }
+    .wave-bar:nth-child(1)  { height: 10px; animation-delay: 0.0s; }
+    .wave-bar:nth-child(2)  { height: 18px; animation-delay: 0.1s; }
+    .wave-bar:nth-child(3)  { height: 28px; animation-delay: 0.2s; }
+    .wave-bar:nth-child(4)  { height: 36px; animation-delay: 0.3s; }
+    .wave-bar:nth-child(5)  { height: 28px; animation-delay: 0.4s; }
+    .wave-bar:nth-child(6)  { height: 18px; animation-delay: 0.5s; }
+    .wave-bar:nth-child(7)  { height: 10px; animation-delay: 0.6s; }
+    .wave-bar:nth-child(8)  { height: 18px; animation-delay: 0.7s; }
+    .wave-bar:nth-child(9)  { height: 28px; animation-delay: 0.8s; }
+    .wave-bar:nth-child(10) { height: 36px; animation-delay: 0.9s; }
+    .wave-bar:nth-child(11) { height: 28px; animation-delay: 1.0s; }
+    .wave-bar:nth-child(12) { height: 18px; animation-delay: 1.1s; }
+    .wave-bar:nth-child(13) { height: 10px; animation-delay: 1.2s; }
+
+    @keyframes wave {
+      0%,100% { transform: scaleY(0.4); opacity: 0.5; }
+      50% { transform: scaleY(1); opacity: 1; }
+    }
+    .wave-bar-container.muted .wave-bar {
+      animation: none;
+      transform: scaleY(0.2);
+      opacity: 0.2;
+    }
+
+    /* ─── Controls ─── */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+    }
+    .ctrl-btn {
+      width: 58px; height: 58px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .ctrl-btn.secondary {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .ctrl-btn.secondary:hover { background: rgba(255,255,255,0.12); }
+    .ctrl-btn.secondary.active {
+      background: rgba(59,130,246,0.2);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .ctrl-btn.end-call {
+      width: 72px; height: 72px;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(239,68,68,0.4);
+    }
+    .ctrl-btn.end-call:hover { transform: scale(1.06); box-shadow: 0 6px 32px rgba(239,68,68,0.6); }
+
+    /* ─── Share link bar ─── */
+    .share-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      width: 100%;
+      max-width: 500px;
+      margin-top: 28px;
+    }
+    .share-bar .share-label { color: var(--muted); font-size: 0.78rem; white-space: nowrap; }
+    .share-bar .share-link {
+      flex: 1;
+      font-size: 0.8rem;
+      color: var(--accent2);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      direction: ltr;
+      text-align: left;
+    }
+    .copy-btn {
+      background: rgba(59,130,246,0.15);
+      border: 1px solid rgba(59,130,246,0.3);
+      border-radius: 8px;
+      color: var(--accent);
+      padding: 5px 12px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: rgba(59,130,246,0.25); }
+    .copy-btn.copied { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: var(--green); }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(30,40,60,0.95);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-size: 0.88rem;
+      color: var(--text);
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
 </head>
 <body>
 
-<h2>Voice Chat 🎤</h2>
+<!-- ════════════════ HOME PAGE ════════════════ -->
+<div class="page" id="homePage">
+  <div class="logo">🎙 VoiceLink</div>
+  <p class="tagline">تواصل صوتي فوري وآمن</p>
 
-<button onclick="createRoom()">إنشاء غرفة</button>
+  <div class="card">
+    <button class="btn btn-primary" onclick="createRoom()">
+      ✦ إنشاء غرفة جديدة
+    </button>
 
-<p id="link"></p>
+    <div class="divider">أو انضم بكود</div>
+
+    <input class="input-field" id="joinInput" type="text" placeholder="أدخل كود الغرفة…" />
+    <button class="btn btn-ghost" onclick="joinRoom()">
+      الانضمام إلى غرفة
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════ CALL PAGE ════════════════ -->
+<div class="page hidden" id="callPage">
+  <div class="call-header">
+    <span class="call-logo">🎙 VoiceLink</span>
+    <div class="status-pill connecting" id="statusPill">
+      <div class="status-dot"></div>
+      <span id="statusText">جارٍ الاتصال…</span>
+    </div>
+  </div>
+
+  <div class="avatar-container">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="avatar" id="callAvatar">👤</div>
+  </div>
+
+  <div class="caller-name" id="callerName">غرفة المحادثة</div>
+  <div class="call-timer" id="callTimer">00:00</div>
+
+  <div class="wave-bar-container" id="waveContainer">
+    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn secondary" id="speakerBtn" title="مكبر الصوت" onclick="toggleSpeaker()">🔊</button>
+    <button class="ctrl-btn end-call" onclick="endCall()" title="إنهاء المكالمة">📵</button>
+    <button class="ctrl-btn secondary" id="muteBtn" title="كتم الميكروفون" onclick="toggleMute()">🎤</button>
+  </div>
+
+  <div class="share-bar" id="shareBar" style="display:none">
+    <span class="share-label">شارك الغرفة:</span>
+    <span class="share-link" id="shareLinkText"></span>
+    <button class="copy-btn" id="copyBtn" onclick="copyLink()">نسخ</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-
 <script>
-let peer = new Peer();
-let localStream;
+  let peer = new Peer();
+  let localStream;
+  let isMuted = false;
+  let speakerOn = true;
+  let callTimer;
+  let seconds = 0;
+  let currentCall;
+  let shareLink = '';
+  let remoteAudios = [];
 
-const urlParams = new URLSearchParams(window.location.search);
-const roomId = urlParams.get('room');
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomId = urlParams.get('room');
 
-async function start(room) {
-  localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  // ─── Navigation ───
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.getElementById(pageId).classList.remove('hidden');
+  }
 
-  peer.on('open', id => {
-    if (room !== id) {
-      let call = peer.call(room, localStream);
+  function goToCallPage(roomCode, isHost) {
+    showPage('callPage');
+    document.getElementById('callerName').textContent = `غرفة: ${roomCode}`;
 
-      call.on('stream', remoteStream => {
-        let audio = document.createElement("audio");
-        audio.srcObject = remoteStream;
-        audio.play();
-      });
+    if (isHost) {
+      shareLink = window.location.origin + window.location.pathname + '?room=' + roomCode;
+      const shareBar = document.getElementById('shareBar');
+      shareBar.style.display = 'flex';
+      document.getElementById('shareLinkText').textContent = shareLink;
     }
-  });
 
-  peer.on('call', call => {
-    call.answer(localStream);
+    startCallFlow(roomCode, isHost);
+  }
 
-    call.on('stream', remoteStream => {
-      let audio = document.createElement("audio");
-      audio.srcObject = remoteStream;
-      audio.play();
+  // ─── Create Room ───
+  function createRoom() {
+    const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    goToCallPage(roomCode, true);
+  }
+
+  // ─── Join Room ───
+  function joinRoom() {
+    const code = document.getElementById('joinInput').value.trim().toUpperCase();
+    if (!code) { showToast('أدخل كود الغرفة أولاً'); return; }
+    goToCallPage(code, false);
+  }
+
+  // ─── Main call flow ───
+  async function startCallFlow(room, isHost) {
+    try {
+      localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch(e) {
+      showToast('لم يتم السماح بالوصول للميكروفون');
+      return;
+    }
+
+    peer.on('open', id => {
+      if (!isHost) {
+        // Guest: call the host
+        const call = peer.call(room, localStream);
+        currentCall = call;
+        call.on('stream', remoteStream => {
+          setConnected();
+          playRemoteStream(remoteStream);
+        });
+        call.on('close', () => { showToast('انتهت المكالمة'); });
+      }
     });
-  });
-}
 
-function createRoom() {
-  const newId = Math.random().toString(36).substring(2, 8);
-  const link = window.location.origin + "?room=" + newId;
+    peer.on('call', call => {
+      currentCall = call;
+      call.answer(localStream);
+      setConnected();
+      call.on('stream', remoteStream => { playRemoteStream(remoteStream); });
+      call.on('close', () => { showToast('انتهت المكالمة'); });
+    });
+  }
 
-  document.getElementById("link").innerHTML =
-    "رابطك: <a href='" + link + "'>" + link + "</a>";
-}
+  function setConnected() {
+    const pill = document.getElementById('statusPill');
+    pill.className = 'status-pill';
+    document.getElementById('statusText').textContent = 'متصل';
+    document.getElementById('callAvatar').classList.add('speaking');
+    startTimer();
+  }
 
-// إذا فتح رابط فيه روم
-if (roomId) {
-  start(roomId);
-}
+  function playRemoteStream(stream) {
+    const audio = new Audio();
+    audio.srcObject = stream;
+    audio.play();
+    remoteAudios.push(audio);
+  }
+
+  // ─── Timer ───
+  function startTimer() {
+    callTimer = setInterval(() => {
+      seconds++;
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById('callTimer').textContent = `${m}:${s}`;
+    }, 1000);
+  }
+
+  // ─── Controls ───
+  function toggleMute() {
+    isMuted = !isMuted;
+    if (localStream) {
+      localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
+    }
+    const btn = document.getElementById('muteBtn');
+    const wave = document.getElementById('waveContainer');
+    btn.textContent = isMuted ? '🔇' : '🎤';
+    btn.classList.toggle('active', isMuted);
+    wave.classList.toggle('muted', isMuted);
+    showToast(isMuted ? 'تم كتم الميكروفون' : 'تم تشغيل الميكروفون');
+  }
+
+  function toggleSpeaker() {
+    speakerOn = !speakerOn;
+    remoteAudios.forEach(a => a.muted = !speakerOn);
+    const btn = document.getElementById('speakerBtn');
+    btn.textContent = speakerOn ? '🔊' : '🔈';
+    btn.classList.toggle('active', !speakerOn);
+    showToast(speakerOn ? 'تم تشغيل السماعة' : 'تم إيقاف السماعة');
+  }
+
+  function endCall() {
+    if (currentCall) currentCall.close();
+    if (localStream) localStream.getTracks().forEach(t => t.stop());
+    clearInterval(callTimer);
+    remoteAudios.forEach(a => { a.pause(); a.srcObject = null; });
+    remoteAudios = [];
+    seconds = 0;
+    document.getElementById('callTimer').textContent = '00:00';
+    document.getElementById('statusPill').className = 'status-pill connecting';
+    document.getElementById('statusText').textContent = 'جارٍ الاتصال…';
+    document.getElementById('callAvatar').classList.remove('speaking');
+    document.getElementById('shareBar').style.display = 'none';
+    showPage('homePage');
+    showToast('تم إنهاء المكالمة');
+  }
+
+  // ─── Copy link ───
+  function copyLink() {
+    navigator.clipboard.writeText(shareLink).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ تم النسخ';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'نسخ'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  // ─── Toast ───
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ─── Auto-join if URL has room param ───
+  if (roomId) {
+    const code = roomId.toUpperCase();
+    goToCallPage(code, false);
+  }
 </script>
-
 </body>
 </html>
