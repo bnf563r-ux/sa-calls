@@ -468,7 +468,7 @@
 
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <script>
-  let peer = new Peer();
+  let peer = null;
   let localStream;
   let isMuted = false;
   let speakerOn = true;
@@ -477,6 +477,7 @@
   let currentCall;
   let shareLink = '';
   let remoteAudios = [];
+  let timerStarted = false;
 
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get('room');
@@ -487,65 +488,89 @@
     document.getElementById(pageId).classList.remove('hidden');
   }
 
-  function goToCallPage(roomCode, isHost) {
-    showPage('callPage');
-    document.getElementById('callerName').textContent = `غرفة: ${roomCode}`;
-
-    if (isHost) {
-      shareLink = window.location.origin + window.location.pathname + '?room=' + roomCode;
-      const shareBar = document.getElementById('shareBar');
-      shareBar.style.display = 'flex';
-      document.getElementById('shareLinkText').textContent = shareLink;
-    }
-
-    startCallFlow(roomCode, isHost);
-  }
-
-  // ─── Create Room ───
+  // ─── Create Room: Peer ID = Room Code (lowercase for PeerJS) ───
   function createRoom() {
-    const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    goToCallPage(roomCode, true);
+    const roomCode = Math.random().toString(36).substring(2, 8);
+    initPeer(roomCode, true);
   }
 
   // ─── Join Room ───
   function joinRoom() {
-    const code = document.getElementById('joinInput').value.trim().toUpperCase();
+    const code = document.getElementById('joinInput').value.trim().toLowerCase();
     if (!code) { showToast('أدخل كود الغرفة أولاً'); return; }
-    goToCallPage(code, false);
+    initPeer(null, false, code); // guest gets random peer ID, calls host by room code
   }
 
-  // ─── Main call flow ───
-  async function startCallFlow(room, isHost) {
-    try {
-      localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch(e) {
-      showToast('لم يتم السماح بالوصول للميكروفون');
-      return;
-    }
+  // ─── Init Peer ───
+  // host: peer ID = roomCode so guests can find them
+  // guest: random peer ID, then calls host's peer ID (= roomCode)
+  function initPeer(myId, isHost, hostId) {
+    if (peer) { peer.destroy(); }
 
-    peer.on('open', id => {
-      if (!isHost) {
-        // Guest: call the host
-        const call = peer.call(room, localStream);
+    peer = myId ? new Peer(myId) : new Peer();
+
+    peer.on('error', err => {
+      if (err.type === 'unavailable-id') {
+        showToast('كود الغرفة مستخدم مسبقاً، جرب مرة ثانية');
+        showPage('homePage');
+      } else {
+        showToast('خطأ في الاتصال: ' + err.type);
+      }
+    });
+
+    peer.on('open', async id => {
+      // Get mic
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch(e) {
+        showToast('لم يتم السماح بالوصول للميكروفون');
+        return;
+      }
+
+      const displayCode = (myId || hostId).toUpperCase();
+
+      // Show call UI
+      showPage('callPage');
+      document.getElementById('callerName').textContent = `غرفة: ${displayCode}`;
+
+      if (isHost) {
+        shareLink = window.location.origin + window.location.pathname + '?room=' + myId;
+        const shareBar = document.getElementById('shareBar');
+        shareBar.style.display = 'flex';
+        document.getElementById('shareLinkText').textContent = shareLink;
+
+        // Host: wait for incoming calls
+        peer.on('call', call => {
+          currentCall = call;
+          call.answer(localStream);
+          setConnected();
+          call.on('stream', remoteStream => playRemoteStream(remoteStream));
+          call.on('close', onCallEnded);
+        });
+
+      } else {
+        // Guest: call the host's peer ID (= room code)
+        const call = peer.call(hostId, localStream);
         currentCall = call;
+
+        if (!call) {
+          showToast('تعذر الاتصال بالغرفة');
+          return;
+        }
+
         call.on('stream', remoteStream => {
           setConnected();
           playRemoteStream(remoteStream);
         });
-        call.on('close', () => { showToast('انتهت المكالمة'); });
+        call.on('close', onCallEnded);
+        call.on('error', () => showToast('فشل الاتصال'));
       }
-    });
-
-    peer.on('call', call => {
-      currentCall = call;
-      call.answer(localStream);
-      setConnected();
-      call.on('stream', remoteStream => { playRemoteStream(remoteStream); });
-      call.on('close', () => { showToast('انتهت المكالمة'); });
     });
   }
 
   function setConnected() {
+    if (timerStarted) return;
+    timerStarted = true;
     const pill = document.getElementById('statusPill');
     pill.className = 'status-pill';
     document.getElementById('statusText').textContent = 'متصل';
@@ -553,10 +578,15 @@
     startTimer();
   }
 
+  function onCallEnded() {
+    showToast('انتهت المكالمة');
+  }
+
   function playRemoteStream(stream) {
     const audio = new Audio();
     audio.srcObject = stream;
-    audio.play();
+    audio.autoplay = true;
+    document.body.appendChild(audio); // must be in DOM for autoplay on some browsers
     remoteAudios.push(audio);
   }
 
@@ -573,9 +603,7 @@
   // ─── Controls ───
   function toggleMute() {
     isMuted = !isMuted;
-    if (localStream) {
-      localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
-    }
+    if (localStream) localStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
     const btn = document.getElementById('muteBtn');
     const wave = document.getElementById('waveContainer');
     btn.textContent = isMuted ? '🔇' : '🎤';
@@ -596,10 +624,12 @@
   function endCall() {
     if (currentCall) currentCall.close();
     if (localStream) localStream.getTracks().forEach(t => t.stop());
+    if (peer) { peer.destroy(); peer = null; }
     clearInterval(callTimer);
-    remoteAudios.forEach(a => { a.pause(); a.srcObject = null; });
+    remoteAudios.forEach(a => { a.pause(); a.srcObject = null; a.remove(); });
     remoteAudios = [];
     seconds = 0;
+    timerStarted = false;
     document.getElementById('callTimer').textContent = '00:00';
     document.getElementById('statusPill').className = 'status-pill connecting';
     document.getElementById('statusText').textContent = 'جارٍ الاتصال…';
@@ -624,14 +654,14 @@
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
+    setTimeout(() => t.classList.remove('show'), 2800);
   }
 
   // ─── Auto-join if URL has room param ───
   if (roomId) {
-    const code = roomId.toUpperCase();
-    goToCallPage(code, false);
+    initPeer(null, false, roomId.toLowerCase());
   }
 </script>
 </body>
 </html>
+
